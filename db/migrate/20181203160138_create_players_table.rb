@@ -7,5 +7,6 @@ class CreatePlayersTable < ActiveRecord::Migration[5.0]
       t.integer :cost_of_player
       t.integer :user_id
       t.integer :team_id
+    end
   end
 end
