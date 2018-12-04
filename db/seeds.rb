@@ -2,7 +2,7 @@ require 'rest-client'
 require 'pry'
 require 'json'
 
-
+# Team.destroy_all
 
 url = "https://api.football-data.org/v2/competitions/PL/matches?status=FINISHED"
 key = "5db158231dda4c11b33b88eb0a8f0a4a"
@@ -32,5 +32,23 @@ team_names = match_list.map do |match_hash|
 
 team_list = team_names[0].uniq.sort
 
-binding.pry
-0
+team_list.each do |team_name|
+  Team.create(name: team_name)
+end
+
+match_list.each do |match_hash|
+  Match.create(date: match_hash["date"], team1: match_hash["team1"], team1goals: match_hash["team1goals"], team2: match_hash["team2"], team2goals: match_hash["team2goals"])
+end
+
+
+match_list.each do |match_hash|
+  match_id = Match.find_by(date: match_hash["date"], team1: match_hash["team1"]).id
+  team1_id = Team.find_by(name: match_hash["team1"]).id
+  team2_id = Team.find_by(name: match_hash["team2"]).id
+  MatchTeam.create(match_id: match_id, team_id: team1_id)
+  MatchTeam.create(match_id: match_id, team_id: team2_id)
+end
+
+
+# binding.pry
+# 0
