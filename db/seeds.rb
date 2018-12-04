@@ -3,9 +3,6 @@ require_relative '../config/environment'
 all_spells = RestClient.get("https://www.potterapi.com/v1/spells?key=$2a$10$0ewomlY54wR7s9seLoIPseKIfjkMu6m.2EAtv52OpfgEYGAGwWlRu")
 spells_json = JSON.parse(all_spells)
 
-Spell.delete_all
-Spellbook.delete_all
-
 spells_json.map do |spell|
   if !Spell.find_by(name: spell["name"])
     new_spell = Spell.new
@@ -14,9 +11,4 @@ spells_json.map do |spell|
     new_spell.effect = spell["effect"]
     new_spell.save
   end
-end
-
-spell_types = ["Spell", "Charm", "Enchantment", "Hex", "Curse", "Jinx"]
-spell_types.each do |type|
-  Spellbook.create(name: type)
 end
