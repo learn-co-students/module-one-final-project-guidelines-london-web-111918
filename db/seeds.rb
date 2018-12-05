@@ -2,7 +2,7 @@ require 'rest-client'
 require 'pry'
 require 'json'
 
-# Team.destroy_all
+# Get Match Info From API -------------
 
 url = "https://api.football-data.org/v2/competitions/PL/matches?status=FINISHED"
 key = "5db158231dda4c11b33b88eb0a8f0a4a"
@@ -15,40 +15,71 @@ matches = []
 matches = match_array.map do |match_hash|
               new_match = {}
               new_match["date"] = match_hash["utcDate"][0..9]
-              new_match["team1"] = match_hash["homeTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
-              new_match["team2"] = match_hash["awayTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
-              new_match["team1goals"] = match_hash["score"]["fullTime"]["homeTeam"]
-              new_match["team2goals"] = match_hash["score"]["fullTime"]["awayTeam"]
+              # new_match["team1"] = match_hash["homeTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
+              # new_match["team2"] = match_hash["awayTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
+              new_match["team1_goals"] = match_hash["score"]["fullTime"]["homeTeam"]
+              new_match["team2_goals"] = match_hash["score"]["fullTime"]["awayTeam"]
+              new_match["match_no"] = match_hash["id"]
               matches << new_match
             end
 
 match_list = matches[0].uniq
 
-team_names = []
-team_names = match_list.map do |match_hash|
-                  team_names << match_hash["team1"]
-                  team_names << match_hash["team2"]
-                end
+# END --------------
 
-team_list = team_names[0].uniq.sort
+# Get Team Info from API -----------
 
-team_list.each do |team_name|
-  Team.create(name: team_name)
+url = "https://api.football-data.org/v2/competitions/PL/teams"
+
+response = RestClient.get(url,'x-auth-token': key )
+response_hash = JSON.parse(response)
+teams_array = response_hash["teams"]
+
+team_info = []
+teams_array.each do |team_hash|
+        new_team_hash = {}
+        new_team_hash["name"] = team_hash["name"].gsub("AFC","").gsub("FC","").strip
+        new_team_hash["colours"] = team_hash["clubColors"]
+        new_team_hash["stadium"] = team_hash["venue"]
+        new_team_hash["address"] = team_hash["address"]
+        new_team_hash["founded"] = team_hash["founded"]
+        team_info << new_team_hash
+      end
+
+# END --------------------
+
+# Seed teams table ----------------
+
+team_info.each do |team_hash|
+  Team.create(name: team_hash["name"], colours: team_hash["colours"], stadium: team_hash["stadium"], address: team_hash["address"], founded: team_hash["founded"])
 end
+
+# END -------------------
+
+# Seed matches table -----------------
 
 match_list.each do |match_hash|
-  Match.create(date: match_hash["date"], team1: match_hash["team1"], team1goals: match_hash["team1goals"], team2: match_hash["team2"], team2goals: match_hash["team2goals"])
+  Match.create(date: match_hash["date"], team1_goals: match_hash["team1_goals"], team2_goals: match_hash["team2_goals"], match_no: match_hash["match_no"])
 end
 
+# END ------------
 
-match_list.each do |match_hash|
-  match_id = Match.find_by(date: match_hash["date"], team1: match_hash["team1"]).id
-  team1_id = Team.find_by(name: match_hash["team1"]).id
-  team2_id = Team.find_by(name: match_hash["team2"]).id
-  MatchTeam.create(match_id: match_id, team_id: team1_id)
-  MatchTeam.create(match_id: match_id, team_id: team2_id)
+# Seed match_teams table ------------
+
+Match.all.each do |match_hash|
+  team1 = ""
+  team2 = ""
+  match_array.find do |match|
+    # binding.pry
+    if match["id"] == match_hash["match_no"]
+      team1 = match["homeTeam"]["name"].gsub("AFC","").gsub("FC","").strip
+      team2 = match["awayTeam"]["name"].gsub("AFC","").gsub("FC","").strip
+    end
+  end
+  team1_id = Team.find_by(name: team1).id
+  team2_id = Team.find_by(name: team2).id
+  # binding.pry
+  MatchTeam.create(match_id: match_hash["id"], team1_id: team1_id, team2_id: team2_id)
 end
 
-
-# binding.pry
-# 0
+# END ----------------
