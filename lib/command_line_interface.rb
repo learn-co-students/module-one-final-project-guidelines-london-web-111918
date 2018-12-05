@@ -52,14 +52,19 @@ class CommandLineInterface
     case get_user_input
     when "1"
       show_all_spells
+      menu
     when "2"
       find_spell
+      menu
     when "3"
       find_by_type
+      menu
     when "4"
       view_spellbook
+      menu
     when "5"
       add_to_spellbook
+      menu
     end
 
 
