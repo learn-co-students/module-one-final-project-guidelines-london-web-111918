@@ -18,8 +18,16 @@ class CommandLineInterface
     TITLE
     puts "Wizard / Witches name:"
     @users_name = get_user_input
-    puts "Welcome #{@users_name}!"
-    create_profile
+    check_user
+  end
+
+  def check_user
+    if find_user
+      puts "Welcome back, #{find_user.name}!"
+    else
+      create_profile
+      puts "Welcome, #{@users_name}!"
+    end
   end
 
   def create_profile
@@ -66,8 +74,6 @@ class CommandLineInterface
       add_to_spellbook
       menu
     end
-
-
   end
 
   def show_all_spells
