@@ -2,6 +2,14 @@ require 'rest-client'
 require 'pry'
 require 'json'
 
+# Destroy Existing DB data ------
+
+Team.destroy_all
+Match.destroy_all
+MatchTeam.destroy_all
+
+#-------------------------------
+
 # Get Match Info From API -------------
 
 url = "https://api.football-data.org/v2/competitions/PL/matches?status=FINISHED"
