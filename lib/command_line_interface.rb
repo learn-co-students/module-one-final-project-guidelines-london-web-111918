@@ -57,6 +57,7 @@ class CommandLineInterface
       4. View Spellbook
       5. Add spell to Spellbook
       6. Remove spell from Spellbook
+      7. Quit
     MENU1
     case get_user_input
     when "1"
@@ -77,6 +78,8 @@ class CommandLineInterface
     when "6"
       remove_from_spellbook
       menu
+    when "7"
+      puts "Mischief Managed"
     end
   end
 
