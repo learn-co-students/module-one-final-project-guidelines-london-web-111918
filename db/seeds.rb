@@ -15,8 +15,6 @@ matches = []
 matches = match_array.map do |match_hash|
               new_match = {}
               new_match["date"] = match_hash["utcDate"][0..9]
-              # new_match["team1"] = match_hash["homeTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
-              # new_match["team2"] = match_hash["awayTeam"]["name"].gsub("AFC", "").gsub("FC", "").strip
               new_match["team1_goals"] = match_hash["score"]["fullTime"]["homeTeam"]
               new_match["team2_goals"] = match_hash["score"]["fullTime"]["awayTeam"]
               new_match["match_no"] = match_hash["id"]
@@ -35,7 +33,7 @@ response = RestClient.get(url,'x-auth-token': key )
 response_hash = JSON.parse(response)
 teams_array = response_hash["teams"]
 
-team_info = []
+teams = []
 teams_array.each do |team_hash|
         new_team_hash = {}
         new_team_hash["name"] = team_hash["name"].gsub("AFC","").gsub("FC","").strip
@@ -43,14 +41,16 @@ teams_array.each do |team_hash|
         new_team_hash["stadium"] = team_hash["venue"]
         new_team_hash["address"] = team_hash["address"]
         new_team_hash["founded"] = team_hash["founded"]
-        team_info << new_team_hash
+        teams << new_team_hash
       end
+
+team_list = teams.sort_by {|team| team["name"]}
 
 # END --------------------
 
 # Seed teams table ----------------
 
-team_info.each do |team_hash|
+team_list.each do |team_hash|
   Team.create(name: team_hash["name"], colours: team_hash["colours"], stadium: team_hash["stadium"], address: team_hash["address"], founded: team_hash["founded"])
 end
 
@@ -70,7 +70,6 @@ Match.all.each do |match_hash|
   team1 = ""
   team2 = ""
   match_array.find do |match|
-    # binding.pry
     if match["id"] == match_hash["match_no"]
       team1 = match["homeTeam"]["name"].gsub("AFC","").gsub("FC","").strip
       team2 = match["awayTeam"]["name"].gsub("AFC","").gsub("FC","").strip
@@ -78,7 +77,6 @@ Match.all.each do |match_hash|
   end
   team1_id = Team.find_by(name: team1).id
   team2_id = Team.find_by(name: team2).id
-  # binding.pry
   MatchTeam.create(match_id: match_hash["id"], team1_id: team1_id, team2_id: team2_id)
 end
 
