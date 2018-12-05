@@ -22,18 +22,25 @@ class CommandLineInterface
   end
 
   def check_user
-    if find_user
-      puts "Welcome back, #{find_user.name}!"
+    user = find_user
+    if user
+      puts "Welcome back, #{user.name}!"
     else
-      create_profile
-      puts "Welcome, #{@users_name}!"
+      user = create_profile
+      puts "Welcome, #{user.name}! You have been sorted to #{user.house}"
     end
   end
 
   def create_profile
-    user = User.create(name: @users_name)
+    user = User.create(name: @users_name, house: sorting_hat)
     book = Spellbook.create(name: "#{@users_name}'s Spellbook")
     user.spellbook = book
+    user
+  end
+
+  def sorting_hat
+    houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
+    houses.sample
   end
 
   def find_user
@@ -44,8 +51,22 @@ class CommandLineInterface
     Spellbook.find_by(user_id: find_user.id)
   end
 
+  def find_bind_spell(spell, spellbook)
+    BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id)
+  end
+
+  def find_spell
+    spell = Spell.find_by(name: get_user_input)
+    if !spell
+      puts "Spell not found. Please try again:"
+      find_spell
+    else
+      spell
+    end
+  end
+
   def get_user_input
-    gets.chomp.capitalize
+    gets.chomp.split.map(&:capitalize).join(" ")
   end
 
   def menu
@@ -64,10 +85,10 @@ class CommandLineInterface
       show_all_spells
       menu
     when "2"
-      find_spell
+      spell_search
       menu
     when "3"
-      find_by_type
+      spell_search_by_type
       menu
     when "4"
       view_spellbook
@@ -83,32 +104,30 @@ class CommandLineInterface
     end
   end
 
+  def print_spell(spell)
+    "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+  end
+
   def show_all_spells
     Spell.all.each do |spell|
-      puts "#{spell.id}. name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+      puts "#{spell.id}. #{print_spell(spell)}"
     end
   end
 
-  def find_spell
+  def spell_search
     puts "Please enter a spell name:"
-    spell = Spell.find_by(name: get_user_input)
-    if !spell
-      puts "Spell not found."
-      find_spell
-    else
-      puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
-    end
-    spell
+    spell = find_spell
+    puts print_spell(spell)
   end
 
-  def find_by_type
+  def spell_search_by_type
     puts "Please enter a spell type:"
     types = Spell.where(spell_type: get_user_input)
     if types.empty?
       puts "No spells found of that type."
-      find_by_type
+      spell_search_by_type
     else
-      types.each {|spell| puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"}
+      types.each {|spell| puts print_spell(spell)}
     end
   end
 
@@ -120,29 +139,30 @@ class CommandLineInterface
       puts "Your Spellbook has no spells."
     else
       user.spellbook.spells.each do |spell|
-        puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+        puts print_spell(spell)
       end
     end
   end
 
   def add_to_spellbook
+    puts "Enter a Spell to add:"
     spell = find_spell
     spellbook = find_spellbook
-    bind_spell = BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id)
+    bind_spell = find_bind_spell(spell, spellbook)
     if bind_spell
-      puts "#{spell.name} is already in your Spellbook"
+      puts "#{spell.name} is already in your Spellbook."
     else
       BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
-      puts "#{spell.name} has been added to your Spellbook"
+      puts "#{spell.name} has been added to your Spellbook."
     end
   end
 
   def remove_from_spellbook
-    puts "Select Spell to remove"
+    puts "Enter a Spell to remove:"
     spell = find_spell
     spellbook = find_spellbook
-    BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id).destroy
+    find_bind_spell(spell, spellbook).destroy
+    puts "#{spell.name} has been removed from your Spellbook."
   end
-
 
 end
