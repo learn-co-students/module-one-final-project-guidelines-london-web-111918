@@ -110,8 +110,15 @@ class CommandLineInterface
   def add_to_spellbook
     spell = find_spell
     spellbook = find_spellbook
-    BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
-    puts "#{spell.name} has been added to your Spellbook"
+    bind_spell = BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id)
+    if bind_spell
+      puts "#{spell.name} is already in your Spellbook"
+    else
+      BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
+      puts "#{spell.name} has been added to your Spellbook"
+    end
   end
+
+
 
 end
