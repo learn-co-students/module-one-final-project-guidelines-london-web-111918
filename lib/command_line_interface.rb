@@ -56,6 +56,7 @@ class CommandLineInterface
       3. Find spells by type
       4. View Spellbook
       5. Add spell to Spellbook
+      6. Remove spell from Spellbook
     MENU1
     case get_user_input
     when "1"
@@ -72,6 +73,9 @@ class CommandLineInterface
       menu
     when "5"
       add_to_spellbook
+      menu
+    when "6"
+      remove_from_spellbook
       menu
     end
   end
@@ -130,6 +134,12 @@ class CommandLineInterface
     end
   end
 
+  def remove_from_spellbook
+    puts "Select Spell to remove"
+    spell = find_spell
+    spellbook = find_spellbook
+    BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id).destroy
+  end
 
 
 end
