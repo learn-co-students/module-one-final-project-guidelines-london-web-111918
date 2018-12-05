@@ -19,11 +19,13 @@ class CommandLineInterface
     puts "Wizard / Witches name:"
     @users_name = get_user_input
     puts "Welcome #{@users_name}!"
-    create_user
+    create_profile
   end
 
-  def create_user
-    User.create(name: @users_name)
+  def create_profile
+    user = User.create(name: @users_name)
+    book = Spellbook.create(name: "#{@users_name}'s Spellbook")
+    user.spellbook = book
   end
 
   def get_user_input
@@ -36,6 +38,7 @@ class CommandLineInterface
       1. List all spells
       2. Find spell by name
       3. Find spells by type
+      4. View Spellbook
     MENU1
     case get_user_input
     when "1"
@@ -44,7 +47,10 @@ class CommandLineInterface
       find_spell
     when "3"
       find_by_type
+    when "4"
+      view_spellbook
     end
+
   end
 
   def show_all_spells
@@ -74,5 +80,20 @@ class CommandLineInterface
       types.each {|spell| puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"}
     end
   end
+
+  def view_spellbook
+    user = User.find_by(name: @users_name)
+    puts "#{@users_name}'s Spellbook"
+    puts "*****************"
+    if user.spellbook.spells.empty?
+      puts "Your Spellbook has no spells."
+    else
+      user.spellbook.spells.each do |spell|
+        puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+      end
+    end
+  end
+
+
 
 end
