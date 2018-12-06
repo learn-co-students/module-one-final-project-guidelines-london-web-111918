@@ -4,18 +4,18 @@ class CommandLineInterface
 
   def run
     welcome
-    menu_table
+    menu
   end
 
   def welcome
-    puts <<-TITLE
+    puts Rainbow("
     ,--.   ,--.              ,--.   ,--.            ,---.     ,---.                ,--.,--.
     |  |   |  | ,---. ,--.--.|  | ,-|  |     ,---. /  .-'    '   .-'  ,---.  ,---. |  ||  | ,---.
     |  |.'.|  || .-. ||  .--'|  |' .-. |    | .-. ||  `-,    `.  `-. | .-. || .-. :|  ||  |(  .-'
     |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
     '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
                                                                      `--'
-    TITLE
+    ").magenta.bright
     puts "Wizard / Witch Name:"
     @users_name = get_user_input
     check_user
@@ -23,18 +23,23 @@ class CommandLineInterface
 
   def check_user
     if find_user
-      puts "Welcome back, #{find_user.name}!"
+      puts "\nWelcome back, #{find_user.name}!\n\n"
     else
-      create_profile
-      puts "Welcome, #{@users_name}!"
+      user = create_profile
+      puts "\nWelcome, #{user.name}! You have been sorted to #{user.house}!\n\n"
     end
-  puts "\n"
   end
 
   def create_profile
-    user = User.create(name: @users_name)
+    user = User.create(name: @users_name, house: sorting_hat)
     book = Spellbook.create(name: "#{@users_name}'s Spellbook")
     user.spellbook = book
+    user
+  end
+
+  def sorting_hat
+    houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
+    houses.sample
   end
 
   def find_user
@@ -45,11 +50,28 @@ class CommandLineInterface
     Spellbook.find_by(user_id: find_user.id)
   end
 
-  def get_user_input
-    gets.chomp.capitalize
+  def find_bind_spell(spell, spellbook)
+    BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id)
   end
 
-  def menu_table
+  def find_spell
+    user_input = get_user_input
+    spell = Spell.find_by(name: user_input)
+    if user_input == 1
+      menu
+    elsif !spell
+      puts "\nSpell not found. Enter 1 for Menu or try again:"
+      find_spell
+    else
+      spell
+    end
+  end
+
+  def get_user_input
+    gets.chomp.split.map(&:capitalize).join(" ")
+  end
+
+  def menu
     puts "Please select one of the following options:"
     rows = []
     rows << [1, "List all Spells"]
@@ -65,27 +87,26 @@ class CommandLineInterface
     case get_user_input
       when "1"
         show_all_spells
-        menu_table
+        menu
       when "2"
-        find_spell
-        menu_table
+        spell_search
+        menu
       when "3"
-        find_by_type
-        menu_table
+        spell_search_by_type
+        menu
       when "4"
         view_spellbook
-        menu_table
+        menu
       when "5"
         add_to_spellbook
-        menu_table
+        menu
       when "6"
         remove_from_spellbook
-        menu_table
+        menu
       when "7"
-        puts "✧･ﾟ: *✧･ﾟ:* 　Mischief Managed　 *:･ﾟ✧*:･ﾟ✧"
+        puts Rainbow("✧･ﾟ: *✧･ﾟ:*   ").lightseagreen.blink + Rainbow("Mischief Managed").lightseagreen + Rainbow("   *:･ﾟ✧*:･ﾟ✧").lightseagreen.blink
     end
   end
-
 
   def show_all_spells
     rows = []
@@ -93,79 +114,68 @@ class CommandLineInterface
       rows << [spell.name, spell.spell_type, spell.effect]
     end
     table = Terminal::Table.new :title => "Spells", :headings => ['Name', 'Type', 'Effect'], :rows => rows
-    puts table
-    puts "\n\n"
+    puts "#{table}\n\n"
   end
 
-
-  def find_spell
+  def spell_search
     puts "Please enter a spell name:"
+    spell = find_spell
     rows = []
-    spell = Spell.find_by(name: get_user_input)
-    if !spell
-      puts "Spell not found."
-      find_spell
-    else
-      rows << [spell.name, spell.spell_type, spell.effect]
-    end
-    table = Terminal::Table.new :title => "Spells", :headings => ['Name', 'Type', 'Effect'], :rows => rows
-    puts table
-    puts "\n\n"
+    rows << [spell.name, spell.spell_type, spell.effect]
+    table = Terminal::Table.new :headings => ['Name', 'Type', 'Effect'], :rows => rows
+    puts "\n#{table}\n\n"
     spell
   end
 
-
-  def find_by_type
-    rows = []
-    puts "Please enter a spell type:"
+  def spell_search_by_type
+    puts "\nPlease enter a spell type:"
     user_input = get_user_input
     types = Spell.where(spell_type: user_input)
     if types.empty?
-      puts "No spells found of that type."
-      find_by_type
+      puts "\nNo spells found of that type. Enter 1 for Menu or try again:"
+      get_user_input == 1 ? menu : spell_search_by_type
     else
+      rows = []
       types.each do |spell|
         rows << [spell.name, spell.spell_type, spell.effect]
       end
       table = Terminal::Table.new :title => "#{user_input} Spells", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
-      puts table
-      puts "\n\n"
-      end
+      puts "\n#{table}\n\n"
     end
+  end
 
   def view_spellbook
     user = find_user
-    rows = []
     if user.spellbook.spells.empty?
-        puts "Your Spellbook has no spells."
-      else
-        user.spellbook.spells.each do |spell|
-          rows << [spell.name, spell.spell_type, spell.effect]
-        end
-        table = Terminal::Table.new :title => "#{user.name}'s Spellbook", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
-        puts table
-        puts "\n\n"
-        end
+      puts "Your Spellbook has no spells."
+    else
+      rows = []
+      user.spellbook.spells.each do |spell|
+        rows << [spell.name, spell.spell_type, spell.effect]
+      end
+      table = Terminal::Table.new :title => "#{user.name}'s Spellbook", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
+      puts "\n#{table}\n\n"
+    end
   end
 
   def add_to_spellbook
+    puts "Enter a Spell to add:"
     spell = find_spell
     spellbook = find_spellbook
-    bind_spell = BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id)
+    bind_spell = find_bind_spell(spell, spellbook)
     if bind_spell
-      puts "#{spell.name} is already in your Spellbook"
+      puts "\n#{spell.name} is already in your Spellbook.\n\n"
     else
       BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
-      puts "#{spell.name} has been added to your Spellbook"
+      puts "\n#{spell.name} has been added to your Spellbook.\n\n"
     end
   end
 
   def remove_from_spellbook
-    puts "Select Spell to remove"
+    puts "Enter a Spell to remove:"
     spell = find_spell
-    spellbook = find_spellbook
-    BindSpell.find_by(spellbook_id: spellbook.id, spell_id: spell.id).destroy
+    find_bind_spell(find_spell, find_spellbook).destroy
+    puts "#{spell.name} has been removed from your Spellbook.\n\n"
   end
-
 
 end
