@@ -3,7 +3,7 @@ require_relative '../config/environment'
 class CommandLineInterface
 
   def run
-    Gosu::Sample.new("lib/music/Hedwigs_Theme.mp3").play
+    Gosu::Sample.new("lib/music/Hedwigs_Theme.mp3").play(volume = 1, speed = 1, looping = true)
     welcome
     menu
   end
@@ -55,7 +55,7 @@ class CommandLineInterface
       Rainbow(string).color("#ecb939")
     end
   end
-  
+
   def sorting_hat
     houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
     houses.sample
@@ -149,7 +149,7 @@ class CommandLineInterface
       cast_spell
       menu
     when "8"
-      puts colorize("\n✧･ﾟ: *✧･ﾟ:*   ").blink + colorize("Mischief Managed") + colorize("   *:･ﾟ✧*:･ﾟ✧\n").blink
+      puts colorize("\n✧･ﾟ: *✧･ﾟ:*   ").blink + colorize("Mischief Managed") + colorize("   *:･ﾟ✧* :･ﾟ✧\n").blink
     else
       puts "\nIncorrect input. Please enter a number, 1-7:"
       choice
