@@ -72,18 +72,19 @@ def team_information
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
     team_information
+  else
+    info = Team.find_by(id: input.to_i)
+    puts "----------------------------------------------------------"
+    puts " "
+    puts "#{info["name"]} - Team Information"
+    puts " "
+    puts "Club Colours: #{info["colours"]}"
+    puts "Stadium: #{info["stadium"]}"
+    puts "Address: #{info["address"]}"
+    puts "Year Founded: #{info["founded"]}"
+    puts " "
+    menu
   end
-  info = Team.find_by(id: input.to_i)
-  puts "----------------------------------------------------------"
-  puts " "
-  puts "#{info["name"]} - Team Information"
-  puts " "
-  puts "Club Colours: #{info["colours"]}"
-  puts "Stadium: #{info["stadium"]}"
-  puts "Address: #{info["address"]}"
-  puts "Year Founded: #{info["founded"]}"
-  puts " "
-  menu
 end
 
 def query_name
@@ -105,9 +106,10 @@ def query_name
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
     query_name
+  else
+    name = Team.find_by(id: number).name
+    query_type(name)
   end
-  name = Team.find_by(id: number).name
-  query_type(name)
 end
 
 def query_type(name)
@@ -136,8 +138,9 @@ def query_type(name)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
     query_type(name)
+  else
+    query_location(name, query)
   end
-  query_location(name, query)
 end
 
 def query_location(name, query)
@@ -161,8 +164,9 @@ def query_location(name, query)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
     query_location(name, query)
+  else
+    query_run(name, query, location)
   end
-  query_run(name, query, location)
 end
 
 def query_run(name, query, location)
