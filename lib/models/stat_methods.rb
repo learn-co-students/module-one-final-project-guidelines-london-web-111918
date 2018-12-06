@@ -1,4 +1,3 @@
-
 def get_league_table
   teams = Team.all.map(&:name)
   team_rows = []
@@ -6,9 +5,9 @@ def get_league_table
     team_row_hash = {}
     team_row_hash["team"] = name
     team_row_hash["played"] = get_team_matches_all(name).count
-    team_row_hash["wins"] = get_team_wins_all(name)
-    team_row_hash["draws"] = get_team_draws_all(name)
-    team_row_hash["losses"] = get_team_losses_all(name)
+    team_row_hash["wins"] = get_team_wins_all(name).count
+    team_row_hash["draws"] = get_team_draws_all(name).count
+    team_row_hash["losses"] = get_team_losses_all(name).count
     team_row_hash["gf"] = get_team_goals_scored_all(name)
     team_row_hash["ga"] = get_team_goals_conceded_all(name)
     team_row_hash["gd"] = get_team_goal_difference_all(name)
@@ -39,6 +38,42 @@ end
 def get_team_matches_away(name)
   team_id = Team.find_by(name: name).id
   MatchTeam.where(team2_id: team_id)
+end
+
+def get_team_wins_all(name)
+  get_team_wins_home(name).concat(get_team_wins_away(name)).sort_by {|match| match["id"]}
+end
+
+def get_team_wins_home(name)
+  get_team_matches_home(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals > Match.find_by(id: match["match_id"]).team2_goals}
+end
+
+def get_team_wins_away(name)
+  get_team_matches_away(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals < Match.find_by(id: match["match_id"]).team2_goals}
+end
+
+def get_team_draws_all(name)
+  get_team_draws_home(name).concat(get_team_draws_away(name)).sort_by {|match| match["id"]}
+end
+
+def get_team_draws_home(name)
+  get_team_matches_home(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals == Match.find_by(id: match["match_id"]).team2_goals}
+end
+
+def get_team_draws_away(name)
+  get_team_matches_away(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals == Match.find_by(id: match["match_id"]).team2_goals}
+end
+
+def get_team_losses_all(name)
+  get_team_losses_home(name).concat(get_team_losses_away(name)).sort_by {|match| match["id"]}
+end
+
+def get_team_losses_home(name)
+  get_team_matches_home(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals < Match.find_by(id: match["match_id"]).team2_goals}
+end
+
+def get_team_losses_away(name)
+  get_team_matches_away(name).select {|match| Match.find_by(id: match["match_id"]).team1_goals > Match.find_by(id: match["match_id"]).team2_goals}
 end
 
 def get_team_goals_scored_all(name)
@@ -85,62 +120,18 @@ def get_team_goal_difference_away(name)
   get_team_goals_scored_away(name) - get_team_goals_conceded_away(name)
 end
 
-def get_team_wins_all(name)
-  get_team_wins_home(name) + get_team_wins_away(name)
-end
-
-def get_team_wins_home(name)
-  home_wins = 0
-  get_team_matches_home(name).each {|match| home_wins += 1 if Match.find_by(id: match["match_id"]).team1_goals > Match.find_by(id: match["match_id"]).team2_goals}
-  home_wins
-end
-
-def get_team_wins_away(name)
-  away_wins = 0
-  get_team_matches_away(name).each {|match| away_wins += 1 if Match.find_by(id: match["match_id"]).team1_goals < Match.find_by(id: match["match_id"]).team2_goals}
-  away_wins
-end
-
-def get_team_losses_all(name)
-  get_team_losses_home(name) + get_team_losses_away(name)
-end
-
-def get_team_losses_home(name)
-  home_losses = 0
-  get_team_matches_home(name).each {|match| home_losses += 1 if Match.find_by(id: match["match_id"]).team1_goals < Match.find_by(id: match["match_id"]).team2_goals}
-  home_losses
-end
-
-def get_team_losses_away(name)
-  away_losses = 0
-  get_team_matches_away(name).each {|match| away_losses += 1 if Match.find_by(id: match["match_id"]).team1_goals > Match.find_by(id: match["match_id"]).team2_goals}
-  away_losses
-end
-
-def get_team_draws_all(name)
-  get_team_draws_home(name) + get_team_draws_away(name)
-end
-
-def get_team_draws_home(name)
-  home_draws = 0
-  get_team_matches_home(name).each {|match| home_draws += 1 if Match.find_by(id: match["match_id"]).team1_goals == Match.find_by(id: match["match_id"]).team2_goals}
-  home_draws
-end
-
-def get_team_draws_away(name)
-  away_draws = 0
-  get_team_matches_away(name).each {|match| away_draws += 1 if Match.find_by(id: match["match_id"]).team1_goals == Match.find_by(id: match["match_id"]).team2_goals}
-  away_draws
-end
-
 def get_team_points_all(name)
   get_team_points_home(name) + get_team_points_away(name)
 end
 
 def get_team_points_home(name)
-  (get_team_wins_home(name) * 3) + get_team_draws_home(name)
+  (get_team_wins_home(name).count * 3) + get_team_draws_home(name).count
 end
 
 def get_team_points_away(name)
-  (get_team_wins_away(name) * 3) + get_team_draws_away(name)
+  (get_team_wins_away(name) * 3).count + get_team_draws_away(name).count
+end
+
+def get_match_date(date)
+  Match.where(date: date)
 end
