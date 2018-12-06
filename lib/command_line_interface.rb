@@ -8,26 +8,25 @@ class CommandLineInterface
   end
 
   def welcome
-    puts <<-TITLE
-    ,--.   ,--.              ,--.   ,--.            ,---.     ,---.                ,--.,--.
-    |  |   |  | ,---. ,--.--.|  | ,-|  |     ,---. /  .-'    '   .-'  ,---.  ,---. |  ||  | ,---.
-    |  |.'.|  || .-. ||  .--'|  |' .-. |    | .-. ||  `-,    `.  `-. | .-. || .-. :|  ||  |(  .-'
-    |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
-    '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
-                                                                     `--'
-    TITLE
-    puts "Wizard / Witches name:"
+    puts Rainbow("
+            ,--.   ,--.              ,--.   ,--.            ,---.     ,---.                ,--.,--.
+            |  |   |  | ,---. ,--.--.|  | ,-|  |     ,---. /  .-'    '   .-'  ,---.  ,---. |  ||  | ,---.
+            |  |.'.|  || .-. ||  .--'|  |' .-. |    | .-. ||  `-,    `.  `-. | .-. || .-. :|  ||  |(  .-'
+            |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
+            '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
+                                                                             `--'
+    ").crimson.bright
+    puts "Wizard / Witch Name:"
     @users_name = get_user_input
     check_user
   end
 
   def check_user
-    user = find_user
-    if user
-      puts "Welcome back, #{user.name}!"
+    if find_user
+      puts "Welcome back, #{colorize(find_user.name)}!"
     else
       user = create_profile
-      puts "Welcome, #{user.name}! You have been sorted to #{user.house}"
+      puts "Welcome, #{colorize(user.name)}! You have been sorted to #{colorize(user.house)}!"
     end
   end
 
@@ -38,6 +37,20 @@ class CommandLineInterface
     user
   end
 
+  def colorize(string)
+    user = find_user
+    case find_user.house
+    when "Gryffindor"
+      Rainbow(string).color("#ae0001")
+    when "Ravenclaw"
+      Rainbow(string).dodgerblue
+    when "Slytherin"
+      Rainbow(string).color("#2a623d")
+    when "Hufflepuff"
+      Rainbow(string).color("#ecb939")
+    end
+  end
+  
   def sorting_hat
     houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
     houses.sample
@@ -58,10 +71,20 @@ class CommandLineInterface
   def find_spell
     spell = Spell.find_by(name: get_user_input)
     if !spell
-      puts "Spell not found. Please try again:"
+      puts "\nSpell not found. Please try again:"
       find_spell
     else
       spell
+    end
+  end
+
+  def find_spell_type
+    types = Spell.where(spell_type: get_user_input)
+    if types.empty?
+      puts "\nNo spells found of that type. Please try again:"
+      find_spell_type
+    else
+      types
     end
   end
 
@@ -70,16 +93,23 @@ class CommandLineInterface
   end
 
   def menu
+    sparkle
     puts "Please select one of the following options:"
-    puts <<-MENU1
-      1. List all spells
-      2. Find spell by name
-      3. Find spells by type
-      4. View Spellbook
-      5. Add spell to Spellbook
-      6. Remove spell from Spellbook
-      7. Quit
-    MENU1
+    rows = []
+    rows << [1, "List all Spells"]
+    rows << [2, "Find spell by name"]
+    rows << [3, "Find spell by type"]
+    rows << [4, "View Spellbook"]
+    rows << [5, "Add a spell to Spellbook"]
+    rows << [6, "Remove a spell from Spellbook"]
+    rows << [7, "Cast random spell from your Spellbook"]
+    rows << [8, "Quit"]
+    table = Terminal::Table.new :title => colorize("MENU"), :rows => rows
+    puts table
+    choice
+  end
+
+  def choice
     case get_user_input
     when "1"
       show_all_spells
@@ -100,7 +130,13 @@ class CommandLineInterface
       remove_from_spellbook
       menu
     when "7"
-      puts "Mischief Managed"
+      cast_spell
+      menu
+    when "8"
+      puts colorize("\n✧･ﾟ: *✧･ﾟ:*   ").blink + colorize("Mischief Managed") + colorize("   *:･ﾟ✧*:･ﾟ✧\n").blink
+    else
+      puts "\nIncorrect input. Please enter a number, 1-7:"
+      choice
     end
   end
 
@@ -109,60 +145,85 @@ class CommandLineInterface
   end
 
   def show_all_spells
+    rows = []
     Spell.all.each do |spell|
-      puts "#{spell.id}. #{print_spell(spell)}"
+      rows << [spell.name, spell.spell_type, spell.effect]
     end
+    table = Terminal::Table.new :title => colorize("Spells").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
+    sparkle
+    puts "#{table}"
   end
 
   def spell_search
+    sparkle
     puts "Please enter a spell name:"
     spell = find_spell
-    puts print_spell(spell)
+    rows = []
+    rows << [spell.name, spell.spell_type, spell.effect]
+    table = Terminal::Table.new :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
+    puts "\n#{table}"
+    spell
   end
 
   def spell_search_by_type
+    sparkle
     puts "Please enter a spell type:"
-    types = Spell.where(spell_type: get_user_input)
-    if types.empty?
-      puts "No spells found of that type."
-      spell_search_by_type
-    else
-      types.each {|spell| puts print_spell(spell)}
+    spell_types = find_spell_type
+    type = spell_types.first.spell_type
+    rows = []
+    spell_types.each do |spell|
+      rows << [spell.name, spell.spell_type, spell.effect]
     end
+    table = Terminal::Table.new :title => colorize("#{type} Spells").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
+    puts "\n#{table}"
   end
 
   def view_spellbook
     user = find_user
-    puts "#{find_user.name}'s Spellbook"
-    puts "*****************"
     if user.spellbook.spells.empty?
+      sparkle
       puts "Your Spellbook has no spells."
     else
+      rows = []
       user.spellbook.spells.each do |spell|
-        puts print_spell(spell)
+        rows << [spell.name, spell.spell_type, spell.effect]
       end
+      table = Terminal::Table.new :title => colorize("#{user.name}'s Spellbook").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
+      sparkle
+      puts "#{table}"
     end
   end
 
   def add_to_spellbook
+    sparkle
     puts "Enter a Spell to add:"
     spell = find_spell
     spellbook = find_spellbook
     bind_spell = find_bind_spell(spell, spellbook)
     if bind_spell
-      puts "#{spell.name} is already in your Spellbook."
+      puts "\n#{colorize(spell.name).bright} is already in your Spellbook."
     else
       BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
-      puts "#{spell.name} has been added to your Spellbook."
+      puts "\n#{colorize(spell.name).bright} has been added to your Spellbook."
     end
   end
 
   def remove_from_spellbook
+    sparkle
     puts "Enter a Spell to remove:"
     spell = find_spell
-    spellbook = find_spellbook
-    find_bind_spell(spell, spellbook).destroy
-    puts "#{spell.name} has been removed from your Spellbook."
+    find_bind_spell(spell, find_spellbook).destroy
+    puts "\n#{colorize(spell.name).bright} has been removed from your Spellbook."
+  end
+
+  def cast_spell
+    sparkle
+    book = find_user.spellbook.spells.map(&:name)
+    puts Rainbow("(∩｀-´)⊃━☆ -*'^'~*-.,_,.-*~'^'~*-  ").burlywood + colorize("#{book.sample}")
+  end
+
+  def sparkle
+    puts colorize("\n\n✧･ﾟ: *✧･ﾟ:* *:･ﾟ✧*:･ﾟ✧ ✧･ﾟ: *✧･ﾟ:* *:･ﾟ✧*:･ﾟ✧ ✧･ﾟ: *✧･ﾟ:* *:･ﾟ✧*:･ﾟ✧ ✧･ﾟ: *✧･ﾟ:* *:･ﾟ✧*:･ﾟ✧ ✧･ﾟ: *✧･ﾟ:* *:･ﾟ✧*:･ﾟ✧ ✧･ﾟ:･ﾟ✧* *:･ﾟ✧\n\n")
   end
 
 end
