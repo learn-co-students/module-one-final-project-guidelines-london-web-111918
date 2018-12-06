@@ -15,7 +15,7 @@ class CommandLineInterface
     |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
     '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
                                                                      `--'
-    ").magenta.bright
+    ").crimson.bright
     puts "Wizard / Witch Name:"
     @users_name = get_user_input
     check_user
@@ -23,10 +23,10 @@ class CommandLineInterface
 
   def check_user
     if find_user
-      puts "\nWelcome back, #{find_user.name}!\n\n"
+      puts "\nWelcome back, #{colorize(find_user.name)}!\n\n"
     else
       user = create_profile
-      puts "\nWelcome, #{user.name}! You have been sorted to #{user.house}!\n\n"
+      puts "\nWelcome, #{colorize(user.name)}! You have been sorted to #{colorize(user.house)}!\n\n"
     end
   end
 
@@ -35,6 +35,20 @@ class CommandLineInterface
     book = Spellbook.create(name: "#{@users_name}'s Spellbook")
     user.spellbook = book
     user
+  end
+
+  def colorize(string)
+    user = find_user
+    case find_user.house
+    when "Gryffindor"
+      Rainbow(string).color("#ae0001")
+    when "Ravenclaw"
+      Rainbow(string).dodgerblue
+    when "Slytherin"
+      Rainbow(string).color("#2a623d")
+    when "Hufflepuff"
+      Rainbow(string).color("#ecb939")
+    end
   end
 
   def sorting_hat
@@ -81,30 +95,36 @@ class CommandLineInterface
     rows << [5, "Add a spell to Spellbook"]
     rows << [6, "Remove a spell from Spellbook"]
     rows << [7, "Quit"]
-    table = Terminal::Table.new :title => "MENU", :rows => rows
+    table = Terminal::Table.new :title => colorize("MENU"), :rows => rows
     puts table
+    choice
+  end
 
+  def choice
     case get_user_input
-      when "1"
-        show_all_spells
-        menu
-      when "2"
-        spell_search
-        menu
-      when "3"
-        spell_search_by_type
-        menu
-      when "4"
-        view_spellbook
-        menu
-      when "5"
-        add_to_spellbook
-        menu
-      when "6"
-        remove_from_spellbook
-        menu
-      when "7"
-        puts Rainbow("✧･ﾟ: *✧･ﾟ:*   ").lightseagreen.blink + Rainbow("Mischief Managed").lightseagreen + Rainbow("   *:･ﾟ✧*:･ﾟ✧").lightseagreen.blink
+    when "1"
+      show_all_spells
+      menu
+    when "2"
+      spell_search
+      menu
+    when "3"
+      spell_search_by_type
+      menu
+    when "4"
+      view_spellbook
+      menu
+    when "5"
+      add_to_spellbook
+      menu
+    when "6"
+      remove_from_spellbook
+      menu
+    when "7"
+      puts colorize("✧･ﾟ: *✧･ﾟ:*   ").blink + colorize("Mischief Managed") + colorize("   *:･ﾟ✧*:･ﾟ✧").blink
+    else
+      puts "\nIncorrect input. Please enter a number, 1-7:"
+      choice
     end
   end
 
@@ -113,7 +133,7 @@ class CommandLineInterface
     Spell.all.each do |spell|
       rows << [spell.name, spell.spell_type, spell.effect]
     end
-    table = Terminal::Table.new :title => "Spells", :headings => ['Name', 'Type', 'Effect'], :rows => rows
+    table = Terminal::Table.new :title => colorize("Spells").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
     puts "#{table}\n\n"
   end
 
@@ -122,7 +142,7 @@ class CommandLineInterface
     spell = find_spell
     rows = []
     rows << [spell.name, spell.spell_type, spell.effect]
-    table = Terminal::Table.new :headings => ['Name', 'Type', 'Effect'], :rows => rows
+    table = Terminal::Table.new :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
     puts "\n#{table}\n\n"
     spell
   end
@@ -139,7 +159,7 @@ class CommandLineInterface
       types.each do |spell|
         rows << [spell.name, spell.spell_type, spell.effect]
       end
-      table = Terminal::Table.new :title => "#{user_input} Spells", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
+      table = Terminal::Table.new :title => colorize("#{user_input} Spells").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
       puts "\n#{table}\n\n"
     end
   end
@@ -147,13 +167,13 @@ class CommandLineInterface
   def view_spellbook
     user = find_user
     if user.spellbook.spells.empty?
-      puts "Your Spellbook has no spells."
+      puts "\nYour Spellbook has no spells.\n\n"
     else
       rows = []
       user.spellbook.spells.each do |spell|
         rows << [spell.name, spell.spell_type, spell.effect]
       end
-      table = Terminal::Table.new :title => "#{user.name}'s Spellbook", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
+      table = Terminal::Table.new :title => colorize("#{user.name}'s Spellbook").bright, :headings => [Rainbow('Name').burlywood, Rainbow('Type').burlywood, Rainbow('Effect').burlywood], :rows => rows
       puts "\n#{table}\n\n"
     end
   end
@@ -164,10 +184,10 @@ class CommandLineInterface
     spellbook = find_spellbook
     bind_spell = find_bind_spell(spell, spellbook)
     if bind_spell
-      puts "\n#{spell.name} is already in your Spellbook.\n\n"
+      puts "\n#{colorize(spell.name)} is already in your Spellbook.\n\n"
     else
       BindSpell.create(spellbook_id: spellbook.id, spell_id: spell.id)
-      puts "\n#{spell.name} has been added to your Spellbook.\n\n"
+      puts "\n#{colorize(spell.name)} has been added to your Spellbook.\n\n"
     end
   end
 
@@ -175,7 +195,7 @@ class CommandLineInterface
     puts "Enter a Spell to remove:"
     spell = find_spell
     find_bind_spell(find_spell, find_spellbook).destroy
-    puts "#{spell.name} has been removed from your Spellbook.\n\n"
+    puts "#{colorize(spell.name)} has been removed from your Spellbook.\n\n"
   end
 
 end
