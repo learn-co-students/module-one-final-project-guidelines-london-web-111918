@@ -1,3 +1,17 @@
+def print_league_table
+  table_rows = get_league_table_rows
+  rows = table_rows.map do |team|
+    [ table_rows.index(team)+1, team["team"], team["played"], team["wins"], team["draws"], team["losses"], team["gf"], team["ga"], team["gd"], team["points"] ]
+  end
+  league_table = Terminal::Table.new :headings => ['Position', 'Team Name', 'Played', 'Won', 'Drawn', 'Lost', 'Goals For', 'Goals Against', 'Goal Difference', 'Points'], :rows => rows
+  puts "------------------------------------------------------------"
+  puts " "
+  puts "Premier League Table"
+  puts " "
+  puts league_table
+  puts " "
+end
+
 def print_team_matches_all(name)
   matches = get_team_matches_all(name)
   if matches.length == 1
@@ -215,12 +229,12 @@ end
 
 def print_team_goal_difference_home(name)
     diff = get_team_goal_difference_home(name)
-    puts "#{name} have a home goal difference of #{diff} from their home games."
+    puts "#{name} have a goal difference of #{diff} from their home games."
 end
 
 def print_team_goal_difference_away(name)
     diff = get_team_goal_difference_away(name)
-    puts "#{name} have a away goal difference of #{diff} from their away games."
+    puts "#{name} have a goal difference of #{diff} from their away games."
 end
 
 def print_team_points_all(name)
@@ -256,6 +270,8 @@ def print_match_date(date)
     puts "----------------------------------------------------------"
     puts " "
     puts "There were no games played on #{date}!"
+    puts " "
+    match_date
   else
     puts "----------------------------------------------------------"
     puts " "
@@ -264,9 +280,9 @@ def print_match_date(date)
     matches.each do |match|
       team1_id = MatchTeam.find_by(match_id: match["id"]).team1_id
       team2_id = MatchTeam.find_by(match_id: match["id"]).team2_id
-      puts "#{Team.find_by(id: team1_id).name} #{match["team1_goals"]} - #{Team.find_by(id: team2_id).name} #{match["team1_goals"]}"
+      puts "#{Team.find_by(id: team1_id).name} #{match["team1_goals"]} - #{Team.find_by(id: team2_id).name} #{match["team2_goals"]}"
     end
+    puts " "
+    menu
   end
-  puts " "
-  menu
 end

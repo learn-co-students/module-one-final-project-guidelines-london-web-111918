@@ -12,21 +12,22 @@ def welcome
     puts "and facts about Premier League teams and matches from the"
     puts "current season (Aug 2018 - May 2019). The name is a tribute"
     puts "to CEEFAX, the pre-internet text-based information service"
-    puts "on your TV which people used to get the latest football"
-    puts "news and information."
+    puts "via TV which people used to get the latest football news"
+    puts "and information."
 end
 
 def menu
     puts "------------------------------------------------------------"
     puts "To get information about a Premier League team, enter 'info'"
-    puts "To start an information search query, enter 'search'"
-    puts "To search for results by date played, enter 'date'"
+    puts "To start a match information search query, enter 'search'"
+    puts "To search for match results by date, enter 'date'"
     puts "To view the full Premier League table, enter 'table'"
-    puts "(N.B The table is best viewed in fullscreen mode)"
+    puts "(N.B. The table displays best in fullscreen mode)"
     puts "To update the information in the database, enter 'update'"
     puts "Want more info about CEEFAX? enter 'ceefax'"
     puts "------------------------------------------------------------"
-    puts "To exit SEEFACTS, enter 'exit' from anywhere in the program"
+    puts "To return to this menu, enter 'menu' anywhere in the program"
+    puts "To exit SEEFACTS, enter 'exit' anywhere in the program"
     puts "------------------------------------------------------------"
     input = gets.strip
     if input.downcase == 'info'
@@ -41,6 +42,8 @@ def menu
       update
     elsif input.downcase == 'ceefax'
       ceefax
+    elsif input.downcase == 'menu'
+      menu
     elsif input.downcase == "exit"
       puts "----------------------------------------------------------"
       puts "Thankyou for using SEEFACTS, goodbye!"
@@ -68,6 +71,8 @@ def team_information
     puts "Thankyou for using SEEFACTS, goodbye!"
     puts "----------------------------------------------------------"
     return nil
+  elsif input.downcase == "menu"
+    menu
   elsif !input.to_i.between?(1,20)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
@@ -102,6 +107,8 @@ def query_name
     puts "Thankyou for using SEEFACTS, goodbye!"
     puts "----------------------------------------------------------"
     return nil
+  elsif number.downcase == "menu"
+    menu
   elsif !number.to_i.between?(1,20)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
@@ -114,7 +121,7 @@ end
 
 def query_type(name)
   puts "----------------------------------------------------------"
-  puts "To select query to run on your team, please enter the"
+  puts "To select a query to run on your team, please enter the"
   puts "corresponding number as listed below"
   puts "----------------------------------------------------------"
   puts " "
@@ -128,12 +135,18 @@ def query_type(name)
   puts "8. Points"
   puts " "
   puts "----------------------------------------------------------"
+  puts "To start again and select a different team, enter 'back'"
+  puts "----------------------------------------------------------"
   query = gets.strip
   if query.downcase == "exit"
     puts "----------------------------------------------------------"
     puts "Thankyou for using SEEFACTS, goodbye!"
     puts "----------------------------------------------------------"
     return nil
+  elsif query.downcase == "menu"
+    menu
+  elsif query.downcase == "back"
+    query_name
   elsif !query.to_i.between?(1,8)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
@@ -154,12 +167,18 @@ def query_location(name, query)
   puts "3. Away Matches"
   puts " "
   puts "----------------------------------------------------------"
+  puts "To start again and select a different team, enter 'back'"
+  puts "----------------------------------------------------------"
   location = gets.strip
   if location.downcase == "exit"
     puts "----------------------------------------------------------"
     puts "Thankyou for using SEEFACTS, goodbye!"
     puts "----------------------------------------------------------"
     return nil
+  elsif location.downcase == "menu"
+    menu
+  elsif location.downcase == "back"
+    query_name
   elsif !location.to_i.between?(1,3)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
@@ -238,6 +257,8 @@ def match_date
     puts "Thankyou for using SEEFACTS, goodbye!"
     puts "----------------------------------------------------------"
     return nil
+  elsif date.to_s.downcase == "menu"
+    menu
   elsif !(/\d{4}-\d{2}-\d{2}/ === date.to_s)
     puts "----------------------------------------------------------"
     puts "Input not recognised, please enter a valid input"
@@ -248,15 +269,15 @@ def match_date
 end
 
 def table
-  get_league_table
+  print_league_table
   menu
 end
 
 def update
   puts "------------------------------------------------------------"
-  puts "deleting database..."
+  puts "Deleting database..."
   system ("rake db:rollback STEP=3 &>/dev/null")
-  puts "recreating database..."
+  puts "Recreating database..."
   system("rake db:migrate &>/dev/null")
   system("rake db:seed")
   puts " "

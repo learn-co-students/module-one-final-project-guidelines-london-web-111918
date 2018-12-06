@@ -1,4 +1,4 @@
-def get_league_table
+def get_league_table_rows
   teams = Team.all.map(&:name)
   team_rows = []
   teams.each do |name|
@@ -14,16 +14,7 @@ def get_league_table
     team_row_hash["points"] = get_team_points_all(name)
     team_rows << team_row_hash
   end
-  ordered_rows = team_rows.sort_by{|team| team["team"]}.reverse.sort_by{|team| [ team["points"], team["gd"], team["gf"] ]}.reverse
-  rows = ordered_rows.map do |team|
-    [ ordered_rows.index(team)+1, team["team"], team["played"], team["wins"], team["draws"], team["losses"], team["gf"], team["ga"], team["gd"], team["points"] ]
-  end
-  league_table = Terminal::Table.new :headings => ['Position', 'Team Name', 'Played', 'Won', 'Drawn', 'Lost', 'Goals For', 'Goals Against', 'Goal Difference', 'Points'], :rows => rows
-  puts " "
-  puts "Premier League Table"
-  puts " "
-  puts league_table
-  puts " "
+  team_rows.sort_by{|team| team["team"]}.reverse.sort_by{|team| [ team["points"], team["gd"], team["gf"] ]}.reverse
 end
 
 def get_team_matches_all(name)
@@ -41,7 +32,7 @@ def get_team_matches_away(name)
 end
 
 def get_team_wins_all(name)
-  get_team_wins_home(name).concat(get_team_wins_away(name)).sort_by {|match| match["id"]}
+  (get_team_wins_home(name) + get_team_wins_away(name)).sort_by(&:id)
 end
 
 def get_team_wins_home(name)
@@ -53,7 +44,7 @@ def get_team_wins_away(name)
 end
 
 def get_team_draws_all(name)
-  get_team_draws_home(name).concat(get_team_draws_away(name)).sort_by {|match| match["id"]}
+  (get_team_draws_home(name) + get_team_draws_away(name)).sort_by(&:id)
 end
 
 def get_team_draws_home(name)
@@ -65,7 +56,7 @@ def get_team_draws_away(name)
 end
 
 def get_team_losses_all(name)
-  get_team_losses_home(name).concat(get_team_losses_away(name)).sort_by {|match| match["id"]}
+  (get_team_losses_home(name) + get_team_losses_away(name)).sort_by(&:id)
 end
 
 def get_team_losses_home(name)
