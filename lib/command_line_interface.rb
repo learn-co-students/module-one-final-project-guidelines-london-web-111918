@@ -9,12 +9,12 @@ class CommandLineInterface
 
   def welcome
     puts Rainbow("
-    ,--.   ,--.              ,--.   ,--.            ,---.     ,---.                ,--.,--.
-    |  |   |  | ,---. ,--.--.|  | ,-|  |     ,---. /  .-'    '   .-'  ,---.  ,---. |  ||  | ,---.
-    |  |.'.|  || .-. ||  .--'|  |' .-. |    | .-. ||  `-,    `.  `-. | .-. || .-. :|  ||  |(  .-'
-    |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
-    '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
-                                                                     `--'
+            ,--.   ,--.              ,--.   ,--.            ,---.     ,---.                ,--.,--.
+            |  |   |  | ,---. ,--.--.|  | ,-|  |     ,---. /  .-'    '   .-'  ,---.  ,---. |  ||  | ,---.
+            |  |.'.|  || .-. ||  .--'|  |' .-. |    | .-. ||  `-,    `.  `-. | .-. || .-. :|  ||  |(  .-'
+            |   ,'.   |' '-' '|  |   |  || `-' |    ' '-' '|  .-'    .-'    || '-' '|   --.|  ||  |.-'  `)
+            '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
+                                                                             `--'
     ").crimson.bright
     puts "Wizard / Witch Name:"
     @users_name = get_user_input
@@ -102,7 +102,8 @@ class CommandLineInterface
     rows << [4, "View Spellbook"]
     rows << [5, "Add a spell to Spellbook"]
     rows << [6, "Remove a spell from Spellbook"]
-    rows << [7, "Quit"]
+    rows << [7, "Cast random spell from your Spellbook"]
+    rows << [8, "Quit"]
     table = Terminal::Table.new :title => colorize("MENU"), :rows => rows
     puts table
     choice
@@ -129,6 +130,9 @@ class CommandLineInterface
       remove_from_spellbook
       menu
     when "7"
+      cast_spell
+      menu
+    when "8"
       puts colorize("\n✧･ﾟ: *✧･ﾟ:*   ").blink + colorize("Mischief Managed") + colorize("   *:･ﾟ✧*:･ﾟ✧\n").blink
     else
       puts "\nIncorrect input. Please enter a number, 1-7:"
@@ -206,6 +210,12 @@ class CommandLineInterface
     spell = find_spell
     find_bind_spell(spell, find_spellbook).destroy
     puts "\n#{colorize(spell.name).bright} has been removed from your Spellbook."
+  end
+
+  def cast_spell
+    sparkle
+    book = find_user.spellbook.spells.map(&:name)
+    puts Rainbow("(∩｀-´)⊃━☆ -*'^'~*-.,_,.-*~'^'~*-  ").burlywood + colorize("#{book.sample}")
   end
 
   def sparkle
