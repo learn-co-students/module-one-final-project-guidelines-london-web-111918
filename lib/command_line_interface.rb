@@ -3,6 +3,7 @@ require_relative '../config/environment'
 class CommandLineInterface
 
   def run
+    Gosu::Sample.new("lib/music/Hedwigs_Theme.mp3").play
     welcome
     menu
   end
@@ -20,7 +21,7 @@ class CommandLineInterface
     @users_name = get_user_input
     check_user
   end
-  
+
   def get_user_input
     gets.chomp.split.map(&:capitalize).join(" ")
   end
@@ -97,12 +98,10 @@ class CommandLineInterface
   def find_spell_in_spellbook
     input = get_user_input
     book = find_spellbook.spells.map(&:name)
-    if !find_spellbook
-      puts "\nYou do not know any spells. Add spells you know to your Spellbook."
-    elsif book.include?(input)
+    if book.include?(input)
       input
     else
-      puts "\nYou have not entered a spell that is in your Spellbook. Try again:"
+      puts "\nYou have entered a spell that is not in your Spellbook. Try again:"
       find_spell_in_spellbook
     end
   end
@@ -235,8 +234,12 @@ class CommandLineInterface
 
   def cast_spell
     sparkle
-    puts "Enter a spell you wish to cast:"
-    puts Rainbow("\n(∩｀-´)⊃━☆   -*'^'~*-.,_,.-*~'^'~*-   ").burlywood + colorize("#{find_spell_in_spellbook}")
+    if find_spellbook.spells.count == 0
+      puts "You do not know any spells. Add spells you know to your Spellbook."
+    else
+      puts "Enter a spell you wish to cast:"
+      puts Rainbow("\n(∩｀-´)⊃━☆   -*'^'~*-.,_,.-*~'^'~*-   ").burlywood + colorize("#{find_spell_in_spellbook}")
+    end
   end
 
   def sparkle
