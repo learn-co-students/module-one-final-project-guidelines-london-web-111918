@@ -3,6 +3,7 @@ require_relative '../config/environment'
 class CommandLineInterface
 
   def run
+    Gosu::Sample.new("lib/music/Hedwigs_Theme.mp3").play
     welcome
     menu
   end
@@ -19,6 +20,10 @@ class CommandLineInterface
     puts "Wizard / Witch Name:"
     @users_name = get_user_input
     check_user
+  end
+
+  def get_user_input
+    gets.chomp.split.map(&:capitalize).join(" ")
   end
 
   def check_user
@@ -56,6 +61,8 @@ class CommandLineInterface
     houses.sample
   end
 
+  # <---------- Find Methods ---------->
+
   def find_user
     User.find_by(name: @users_name)
   end
@@ -88,9 +95,18 @@ class CommandLineInterface
     end
   end
 
-  def get_user_input
-    gets.chomp.split.map(&:capitalize).join(" ")
+  def find_spell_in_spellbook
+    input = get_user_input
+    book = find_spellbook.spells.map(&:name)
+    if book.include?(input)
+      input
+    else
+      puts "\nYou have entered a spell that is not in your Spellbook. Try again:"
+      find_spell_in_spellbook
+    end
   end
+
+  # <---------- End Find Methods ---------->
 
   def menu
     sparkle
@@ -102,7 +118,7 @@ class CommandLineInterface
     rows << [4, "View Spellbook"]
     rows << [5, "Add a spell to Spellbook"]
     rows << [6, "Remove a spell from Spellbook"]
-    rows << [7, "Cast random spell from your Spellbook"]
+    rows << [7, "Cast a spell from your Spellbook"]
     rows << [8, "Quit"]
     table = Terminal::Table.new :title => colorize("MENU"), :rows => rows
     puts table
@@ -218,8 +234,12 @@ class CommandLineInterface
 
   def cast_spell
     sparkle
-    book = find_user.spellbook.spells.map(&:name)
-    puts Rainbow("(∩｀-´)⊃━☆ -*'^'~*-.,_,.-*~'^'~*-  ").burlywood + colorize("#{book.sample}")
+    if find_spellbook.spells.count == 0
+      puts "You do not know any spells. Add spells you know to your Spellbook."
+    else
+      puts "Enter a spell you wish to cast:"
+      puts Rainbow("\n(∩｀-´)⊃━☆   -*'^'~*-.,_,.-*~'^'~*-   ").burlywood + colorize("#{find_spell_in_spellbook}")
+    end
   end
 
   def sparkle
