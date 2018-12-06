@@ -4,7 +4,7 @@ class CommandLineInterface
 
   def run
     welcome
-    menu
+    menu_table
   end
 
   def welcome
@@ -16,7 +16,7 @@ class CommandLineInterface
     '--'   '--' `---' `--'   `--' `---'      `---' `--'      `-----' |  |-'  `----'`--'`--'`----'
                                                                      `--'
     TITLE
-    puts "Wizard / Witches name:"
+    puts "Wizard / Witch Name:"
     @users_name = get_user_input
     check_user
   end
@@ -28,6 +28,7 @@ class CommandLineInterface
       create_profile
       puts "Welcome, #{@users_name}!"
     end
+  puts "\n"
   end
 
   def create_profile
@@ -48,81 +49,103 @@ class CommandLineInterface
     gets.chomp.capitalize
   end
 
-  def menu
+  def menu_table
     puts "Please select one of the following options:"
-    puts <<-MENU1
-      1. List all spells
-      2. Find spell by name
-      3. Find spells by type
-      4. View Spellbook
-      5. Add spell to Spellbook
-      6. Remove spell from Spellbook
-      7. Quit
-    MENU1
+    rows = []
+    rows << [1, "List all Spells"]
+    rows << [2, "Find spell by name"]
+    rows << [3, "Find spell by type"]
+    rows << [4, "View Spellbook"]
+    rows << [5, "Add a spell to Spellbook"]
+    rows << [6, "Remove a spell from Spellbook"]
+    rows << [7, "Quit"]
+    table = Terminal::Table.new :title => "MENU", :rows => rows
+    puts table
+
     case get_user_input
-    when "1"
-      show_all_spells
-      menu
-    when "2"
-      find_spell
-      menu
-    when "3"
-      find_by_type
-      menu
-    when "4"
-      view_spellbook
-      menu
-    when "5"
-      add_to_spellbook
-      menu
-    when "6"
-      remove_from_spellbook
-      menu
-    when "7"
-      puts "Mischief Managed"
+      when "1"
+        show_all_spells
+        menu_table
+      when "2"
+        find_spell
+        menu_table
+      when "3"
+        find_by_type
+        menu_table
+      when "4"
+        view_spellbook
+        menu_table
+      when "5"
+        add_to_spellbook
+        menu_table
+      when "6"
+        remove_from_spellbook
+        menu_table
+      when "7"
+        puts "✧･ﾟ: *✧･ﾟ:* 　Mischief Managed　 *:･ﾟ✧*:･ﾟ✧"
     end
   end
 
+
   def show_all_spells
+    rows = []
     Spell.all.each do |spell|
-      puts "#{spell.id}. name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+      rows << [spell.name, spell.spell_type, spell.effect]
     end
+    table = Terminal::Table.new :title => "Spells", :headings => ['Name', 'Type', 'Effect'], :rows => rows
+    puts table
+    puts "\n\n"
   end
+
 
   def find_spell
     puts "Please enter a spell name:"
+    rows = []
     spell = Spell.find_by(name: get_user_input)
     if !spell
       puts "Spell not found."
       find_spell
     else
-      puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
+      rows << [spell.name, spell.spell_type, spell.effect]
     end
+    table = Terminal::Table.new :title => "Spells", :headings => ['Name', 'Type', 'Effect'], :rows => rows
+    puts table
+    puts "\n\n"
     spell
   end
 
+
   def find_by_type
+    rows = []
     puts "Please enter a spell type:"
-    types = Spell.where(spell_type: get_user_input)
+    user_input = get_user_input
+    types = Spell.where(spell_type: user_input)
     if types.empty?
       puts "No spells found of that type."
       find_by_type
     else
-      types.each {|spell| puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"}
+      types.each do |spell|
+        rows << [spell.name, spell.spell_type, spell.effect]
+      end
+      table = Terminal::Table.new :title => "#{user_input} Spells", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
+      puts table
+      puts "\n\n"
+      end
     end
-  end
 
   def view_spellbook
     user = find_user
-    puts "#{find_user.name}'s Spellbook"
-    puts "*****************"
+    rows = []
     if user.spellbook.spells.empty?
-      puts "Your Spellbook has no spells."
-    else
-      user.spellbook.spells.each do |spell|
-        puts "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
-      end
-    end
+        puts "Your Spellbook has no spells."
+      else
+        user.spellbook.spells.each do |spell|
+          rows << [spell.name, spell.spell_type, spell.effect]
+        end
+        table = Terminal::Table.new :title => "#{user.name}'s Spellbook", :headings => ['Spell', 'Type', 'Effect'], :rows => rows
+        puts table
+        puts "\n\n"
+        end
   end
 
   def add_to_spellbook
