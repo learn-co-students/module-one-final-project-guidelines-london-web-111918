@@ -50,7 +50,7 @@ class CommandLineInterface
       Rainbow(string).color("#ecb939")
     end
   end
-
+  
   def sorting_hat
     houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
     houses.sample
@@ -138,6 +138,10 @@ class CommandLineInterface
       puts "\nIncorrect input. Please enter a number, 1-7:"
       choice
     end
+  end
+
+  def print_spell(spell)
+    "name: #{spell.name}, type: #{spell.spell_type}, effect: #{spell.effect}"
   end
 
   def show_all_spells
