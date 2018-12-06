@@ -55,7 +55,7 @@ class CommandLineInterface
       Rainbow(string).color("#ecb939")
     end
   end
-
+  
   def sorting_hat
     houses = ["Gryffindor", "Ravenclaw", "Slytherin", "Hufflepuff"]
     houses.sample
