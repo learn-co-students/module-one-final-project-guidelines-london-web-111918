@@ -23,8 +23,40 @@ The spells API was used from https://www.potterapi.com/
 
 Welcome screen
 
-![](screenshots/title_screen.png)
+![](screenshots/title.png)
 
 Menu
 
 ![](screenshots/menu.png)
+
+List all spells
+
+![](screenshots/spells.png)
+
+Find spell
+
+![](screenshots/find.png)
+
+Find spell type
+
+![](screenshots/type.png)
+
+View spellbook
+
+![](screenshots/spellbook.png)
+
+Add spell to spellbook
+
+![](screenshots/add.png)
+
+Remove spell from spellbook
+
+![](screenshots/remove.png)
+
+Cast a spell from spellbook
+
+![](screenshots/cast.png)
+
+Quit
+
+![](screenshots/quit.png)
