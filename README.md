@@ -26,7 +26,7 @@ Stretch Goals (To be added)
 Instructions
 ------------
 
-To start the program, move into the project directory in your terminal and run the command 'ruby bin/run.rb'
+Firstly, fork and clone this repo. To start the program, move into the project directory in your terminal and run the command 'ruby bin/run.rb'
 
 Gems Used
 ---------
@@ -36,5 +36,14 @@ This program will install the following Ruby gems if they are not already on you
 - sinatra-activerecord, sqlite3, require_all, json, rest-client, terminal-table, rake
 
 
-Program previews:
+Previews:
+
+s[![](seefacts-info.mp4)
+
+s[![](seefacts-search.mp4)
+
+s[![](seefacts-date.mp4)
+
+s[![](seefacts-table.mp4)
+
 -----------------
