@@ -1,5 +1,4 @@
 require 'rest-client'
-require 'pry'
 require 'json'
 
 # Get Match Info From API -------------
