@@ -19,6 +19,10 @@ Spells API - https://www.potterapi.com/
 2. Change UI color based on house ✔️
 3. Play Hedwigs theme music ✔️
 
+### Installation
+
+1. Run `bundle`
+
 ### Demo
 
 Welcome screen
