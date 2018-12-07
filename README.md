@@ -21,7 +21,10 @@ Spells API - https://www.potterapi.com/
 
 ### Installation
 
-1. Run `bundle`
+1. Run `brew install sdl2`. This is a prereq for the gosu gem
+2. Run `bundle`
+3. Run `rake db:migrate` and `rake db:seed`
+4. `ruby bin/run.rb` to start the app
 
 ### Demo
 
