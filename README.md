@@ -21,4 +21,10 @@ The spells API was used from https://www.potterapi.com/
 
 ### Demo
 
+Welcome screen
+
 ![](screenshots/title_screen.png)
+
+Menu
+
+![](screenshots/menu.png)
