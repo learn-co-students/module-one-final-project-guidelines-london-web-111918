@@ -21,42 +21,42 @@ Spells API - https://www.potterapi.com/
 
 ### Demo
 
-####Welcome screen
+Welcome screen
 
 ![](screenshots/title.png)
 
-####Menu
+Menu
 
 ![](screenshots/menu.png)
 
-####List all spells
+List all spells
 
 ![](screenshots/spells.png)
 
-####Find spell
+Find spell
 
 ![](screenshots/find.png)
 
-####Find spell type
+Find spell type
 
 ![](screenshots/type.png)
 
-####View spellbook
+View spellbook
 
 ![](screenshots/spellbook.png)
 
-####Add spell to spellbook
+Add spell to spellbook
 
 ![](screenshots/add.png)
 
-####Remove spell from spellbook
+Remove spell from spellbook
 
 ![](screenshots/remove.png)
 
-####Cast a spell from spellbook
+Cast a spell from spellbook
 
 ![](screenshots/cast.png)
 
-####Quit
+Quit
 
 ![](screenshots/quit.png)
