@@ -3,7 +3,7 @@
 ## Flatiron Module 1 Final Project
 World of Spells is a small CLI app for all the Harry Potter lovers out there.
 
-The spells API was used from https://www.potterapi.com/
+Spells API - https://www.potterapi.com/
 
 ### MVP
 
