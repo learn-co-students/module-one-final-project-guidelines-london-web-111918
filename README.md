@@ -6,9 +6,9 @@ This CLI was written in Ruby and designed as a way for people to access informat
 Features
 --------
 
-- Ability to find out information about any of the current Premier League teams, such as team colours and the year the club  was founded in.
+- Ability to find out information about any of the current Premier League teams, such as team colours and the year the club  was founded.
 
-- Ability to run search queries for match information, filtering my team and location.
+- Ability to run search queries for match information filtering by team and location.
 
 - Ability to search for match results by the date they were played.
 
@@ -26,7 +26,7 @@ Stretch Goals (To be added)
 Instructions
 ------------
 
-Firstly, fork and clone this repo. To start the program, move into the project directory in your terminal and run the command 'ruby bin/run.rb'
+Firstly, fork and clone this repository. To start the program, move into the project directory in your terminal and run the command 'ruby bin/run.rb'
 
 Gems Used
 ---------
