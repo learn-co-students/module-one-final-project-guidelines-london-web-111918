@@ -37,13 +37,22 @@ This program will install the following Ruby gems if they are not already on you
 
 
 Previews:
+---------
 
-s[![](seefacts-info.mp4)
+Team information search:
 
-s[![](seefacts-search.mp4)
+![](seefacts-info.gif)
 
-s[![](seefacts-date.mp4)
+Match information search:
 
-s[![](seefacts-table.mp4)
+![](seefacts-search.gif)
+
+Matches by date search:
+
+![](seefacts-date.gif)
+
+Full table:
+
+![](seefacts-table.gif)
 
 -----------------
