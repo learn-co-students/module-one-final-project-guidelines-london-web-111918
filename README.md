@@ -23,6 +23,11 @@ Stretch Goals (To be added)
 
 - Add in ability to see how many goals a player has scored
 
+Instructions
+------------
+
+To start the program, move into the project directory in your terminal and run the command 'ruby bin/run.rb'
+
 Gems Used
 ---------
 
